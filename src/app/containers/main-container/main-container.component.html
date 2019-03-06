@@ -1,0 +1,21 @@
+<!--<nav class="navbar navbar-expand-lg navbar-light bg-light">-->
+  <!--<div class="container-fluid">-->
+    <!--<ul class="navbar-nav mr-auto">-->
+      <!--<li class="nav-item">-->
+        <!--<a class="nav-link" (click)="setIsMonitoring()">Serial Monitor</a>-->
+      <!--</li>-->
+      <!--<li class="nav-item">-->
+        <!--<a class="nav-link" (click)="setIsGraph()">Graphs</a>-->
+      <!--</li>-->
+      <!--<li class="nav-item">-->
+        <!--<a class="nav-link" (click)="setIsLocalization()">Localization</a>-->
+      <!--</li>-->
+    <!--</ul>-->
+  <!--</div>-->
+<!--</nav>-->
+
+<div class="container-fluid">
+  <app-serialmonitor *ngIf="isMonitoring"></app-serialmonitor>
+  <div *ngIf="isGraph">Graphs</div>
+  <div *ngIf="isLocalization">Localization map</div>
+</div>

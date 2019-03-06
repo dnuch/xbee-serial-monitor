@@ -1,13 +1,16 @@
 {
   "name": "spearsmonitor",
   "version": "0.0.0",
+  "main": "electron/dist/main.js",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
     "test": "ng test",
     "lint": "ng lint",
-    "e2e": "ng e2e"
+    "e2e": "ng e2e",
+    "electron": "ng build --base-href ./ && tsc --p electron && electron .",
+    "rebuild": "electron-rebuild -f -w serialport"
   },
   "private": true,
   "dependencies": {
@@ -19,9 +22,15 @@
     "@angular/platform-browser": "~7.2.0",
     "@angular/platform-browser-dynamic": "~7.2.0",
     "@angular/router": "~7.2.0",
+    "angular5-csv": "^0.2.11",
+    "bootstrap": "^4.3.1",
     "core-js": "^2.5.4",
+    "jquery": "^1.9.1",
+    "popper.js": "^1.14.7",
     "rxjs": "~6.3.3",
+    "serialport": "^7.1.4",
     "tslib": "^1.9.0",
+    "xbee-api": "^0.6.0",
     "zone.js": "~0.8.26"
   },
   "devDependencies": {
@@ -29,10 +38,13 @@
     "@angular/cli": "~7.3.2",
     "@angular/compiler-cli": "~7.2.0",
     "@angular/language-service": "~7.2.0",
-    "@types/node": "~8.9.4",
+    "@types/electron": "^1.6.10",
     "@types/jasmine": "~2.8.8",
     "@types/jasminewd2": "~2.0.3",
+    "@types/node": "~8.9.4",
     "codelyzer": "~4.5.0",
+    "electron": "^4.0.5",
+    "electron-rebuild": "^1.8.4",
     "jasmine-core": "~2.99.1",
     "jasmine-spec-reporter": "~4.2.1",
     "karma": "~3.1.1",
