@@ -1,22 +1,29 @@
 # SPEARS/PHALANX Network UI
-<br />
-## PACKAGE<br />
-> Angular 7<br />
-> serialport 7.1.4<br />
-> electron 4.0.5<br />
-> bootstrap 4<br />
-> node js<br />
-<br />
-## PREREQUISITES
-<br />
-> npm i <br />
+This application interfaces with nodes running on xbee mesh network
+#### PACKAGE
+- Angular 7
+- serialport 7.1.4
+- electron 4.0.5
+- bootstrap 4
+- node.js
+- xbee-api
+- angular5csv
 
-(if installing on windows) <br />
-> npm install --global windows-build-tools<br />
+#### PREREQUISITES
+At root directory:
 
-> npm run rebuild <br />
-<br />
-<br />
-## DEVELOPMENT
-<br />
-npm run electron
+`
+$ npm i
+`
+> if installing on windows
+`
+$ npm install --global windows-build-tools
+`
+
+`
+$ npm run rebuild
+`
+### DEVELOPMENT
+`
+$ npm run electron
+`

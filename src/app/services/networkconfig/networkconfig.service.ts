@@ -17,13 +17,13 @@ export class NetworkconfigService {
   readonly readSensorDataType         = 0x08;
 
   // xbee constants
-  C: any;
+  public C: any;
   // connected serial port
-  port: any;
+  public port: any;
   // SerialPort API
-  serialPort: any;
+  public serialPort: any;
   // xbee-api API
-  xbeeAPI: any;
+  public xbeeAPI: any;
 
   readonly portOpts = {
     baudRate: 38400,
