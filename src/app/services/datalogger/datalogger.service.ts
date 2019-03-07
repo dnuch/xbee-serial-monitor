@@ -76,8 +76,8 @@ export class DataloggerService implements OnInit {
     switch (frame.data[this.PACKET_TYPE_OFFSET]) {
       case this.SENSOR_TYPE:
         //const sAsciiPacket = String.fromCharCode.apply(null, frame.data);
-        const getTimestamp = (frame.data[this.SENSOR_TIMESTAMP_OFFSET + 1] << 8)
-                             | frame.data[this.SENSOR_TIMESTAMP_OFFSET];
+        const getTimestamp = (frame.data[this.SENSOR_TIMESTAMP_OFFSET + 1] << 8) |
+                             frame.data[this.SENSOR_TIMESTAMP_OFFSET];
         const getTemperatureValue = this.float32ToNumber(
           (frame.data[this.SENSOR_TEMPERATURE_OFFSET + 3] << 24) |
           (frame.data[this.SENSOR_TEMPERATURE_OFFSET + 2] << 16) |
@@ -87,9 +87,9 @@ export class DataloggerService implements OnInit {
 
         const getLightValue = this.float32ToNumber(
           (frame.data[this.SENSOR_LIGHT_OFFSET + 3] << 24) |
-            (frame.data[this.SENSOR_LIGHT_OFFSET + 2] << 16) |
-            (frame.data[this.SENSOR_LIGHT_OFFSET + 1] << 8) |
-            frame.data[this.SENSOR_LIGHT_OFFSET]
+          (frame.data[this.SENSOR_LIGHT_OFFSET + 2] << 16) |
+          (frame.data[this.SENSOR_LIGHT_OFFSET + 1] << 8) |
+          frame.data[this.SENSOR_LIGHT_OFFSET]
         );
         const sDate = new Date();
         const sRow: sensorRow = {

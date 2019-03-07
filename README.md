@@ -15,7 +15,7 @@ At root directory:
 `
 $ npm i
 `
-> if installing on windows
+> if installing on windows; open administrative powershell and run: 
 `
 $ npm install --global windows-build-tools
 `

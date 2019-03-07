@@ -25,7 +25,7 @@
     "angular5-csv": "^0.2.11",
     "bootstrap": "^4.3.1",
     "core-js": "^2.5.4",
-    "jquery": "^1.9.1",
+    "jquery": "^3.3.1",
     "popper.js": "^1.14.7",
     "rxjs": "~6.3.3",
     "serialport": "^7.1.4",
