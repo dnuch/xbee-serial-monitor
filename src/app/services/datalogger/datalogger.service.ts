@@ -21,10 +21,43 @@ declare interface sensorRow {
   rcvTimestamp: number;
 }
 
+declare interface aliveTableRow {
+  ID: number;
+  numOfReadings: number;
+  rcvTime: string;
+}
+
+declare interface rangingTableRow {
+  anchorID: number;
+  tagID: number;
+  count: number;
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class DataloggerService implements OnInit {
+
+  // main sensor network
+  readonly mappedMACtoID = {
+    '0013a20041819b8c': 0, /* Coordinator */
+    '0013a2004151a94c': 1, /* Node 1 (SMD) */
+    '0013a2004151a942': 2, /* Node 2 (SMD) */
+    '0013a2004151a94a': 3, /* Node 3 (SMD) */
+    '0013a20041819bb6': 4, /* Node 4 */
+    '0013a2004182d155': 5, /* Node 5 */
+    '0013a2004182d179': 6  /* Node 6 */
+  };
+
+  // danny's network
+  // readonly mappedMACtoID = {
+  //   '0013a2004182d155': 0, /* Coordinator */
+  //   '0013a20041819b0d': 1, /* Node 1 */
+  //   '0013a20041819bab': 2  /* Node 2 */
+  // };
+
+  public aliveTable: Array<aliveTableRow> = [];
+  public rangingTable: Array<rangingTableRow> = [];
 
   public consoleTextArray: Array<string> = [];
   public sensorData: Array<sensorRow> = [];
@@ -33,13 +66,16 @@ export class DataloggerService implements OnInit {
 
   readonly PACKET_TYPE_OFFSET = 0;
 
+  // n byte payload
+  readonly SENSOR_DATA_SIZE_OFFSET = 3;
   // time is 2 bytes => seconds; 2^16 seconds = 0.7585 days
-  readonly SENSOR_TIMESTAMP_OFFSET = 2;
-  readonly SENSOR_TIME_OFFSET = 4;
+  readonly SENSOR_TIMESTAMP_OFFSET = 4;
   // temperature is float
   readonly SENSOR_TEMPERATURE_OFFSET = 6;
   // light is float
   readonly SENSOR_LIGHT_OFFSET = 10;
+  // payload size is 10 bytes; timestamp (2), temperature (4), light (4)
+  readonly SENSOR_PAYLOAD_SIZE = 10;
 
   // two byte value count of number of readings
   readonly ALIVE_NUM_OF_READINGS_OFFSET = 1;
@@ -75,39 +111,48 @@ export class DataloggerService implements OnInit {
   parsePacket(frame: any) {
     switch (frame.data[this.PACKET_TYPE_OFFSET]) {
       case this.SENSOR_TYPE:
-        //const sAsciiPacket = String.fromCharCode.apply(null, frame.data);
-        const getTimestamp = (frame.data[this.SENSOR_TIMESTAMP_OFFSET + 1] << 8) |
-                             frame.data[this.SENSOR_TIMESTAMP_OFFSET];
-        const getTemperatureValue = this.float32ToNumber(
-          (frame.data[this.SENSOR_TEMPERATURE_OFFSET + 3] << 24) |
-          (frame.data[this.SENSOR_TEMPERATURE_OFFSET + 2] << 16) |
-          (frame.data[this.SENSOR_TEMPERATURE_OFFSET + 1] << 8) |
-          frame.data[this.SENSOR_TEMPERATURE_OFFSET]
-        );
-
-        const getLightValue = this.float32ToNumber(
-          (frame.data[this.SENSOR_LIGHT_OFFSET + 3] << 24) |
-          (frame.data[this.SENSOR_LIGHT_OFFSET + 2] << 16) |
-          (frame.data[this.SENSOR_LIGHT_OFFSET + 1] << 8) |
-          frame.data[this.SENSOR_LIGHT_OFFSET]
-        );
         const sDate = new Date();
-        const sRow: sensorRow = {
-          MAC:              frame.remote64,
-          timestamp:        getTimestamp,
-          temperatureValue: getTemperatureValue,
-          lightValue:       getLightValue,
-          rcvTimestamp:     sDate.getTime()
-        };
+        const getDataSize = frame.data[this.SENSOR_DATA_SIZE_OFFSET];
 
-        console.log(sRow);
         this.consoleTextArray
-          .push(`<< ${sDate.toTimeString().slice(0, 8)} ${frame.remote64}: Timestamp: ${
-            getTimestamp}, Temperature: ${getTemperatureValue}, Light: ${getLightValue}`);
-        this.sensorData.push(sRow);
+          .push(`<< ${sDate.toTimeString().slice(0, 8)} Node ${this.mappedMACtoID[frame.remote64]
+          }=> Data Size: ${getDataSize} bytes`);
+
+        // timestamp (2 bytes), temperature (4 bytes), light (4 bytes)
+        for (let i = 0; i < getDataSize / this.SENSOR_PAYLOAD_SIZE; i++) {
+          const nextSensorPacketOffset = i * this.SENSOR_PAYLOAD_SIZE;
+          const getTimestamp = (frame.data[this.SENSOR_TIMESTAMP_OFFSET + 1 + nextSensorPacketOffset] << 8) |
+                               frame.data[this.SENSOR_TIMESTAMP_OFFSET + nextSensorPacketOffset];
+
+          const getTemperatureValue = this.float32ToNumber(
+            (frame.data[this.SENSOR_TEMPERATURE_OFFSET + 3 + nextSensorPacketOffset] << 24) |
+            (frame.data[this.SENSOR_TEMPERATURE_OFFSET + 2 + nextSensorPacketOffset] << 16) |
+            (frame.data[this.SENSOR_TEMPERATURE_OFFSET + 1 + nextSensorPacketOffset] << 8) |
+            frame.data[this.SENSOR_TEMPERATURE_OFFSET + nextSensorPacketOffset]
+          );
+
+          const getLightValue = this.float32ToNumber(
+            (frame.data[this.SENSOR_LIGHT_OFFSET + 3 + nextSensorPacketOffset] << 24) |
+            (frame.data[this.SENSOR_LIGHT_OFFSET + 2 + nextSensorPacketOffset] << 16) |
+            (frame.data[this.SENSOR_LIGHT_OFFSET + 1 + nextSensorPacketOffset] << 8) |
+            frame.data[this.SENSOR_LIGHT_OFFSET + nextSensorPacketOffset]
+          );
+
+          const sRow: sensorRow = {
+            MAC:              frame.remote64,
+            timestamp:        getTimestamp,
+            temperatureValue: getTemperatureValue,
+            lightValue:       getLightValue,
+            rcvTimestamp:     sDate.getTime()
+          };
+
+          console.log(sRow);
+          this.consoleTextArray
+            .push(`-> Timestamp: ${getTimestamp}, Temperature: ${getTemperatureValue}, Light: ${getLightValue}`);
+          this.sensorData.push(sRow);
+        }
         break;
       case this.NODE_ALIVE_TYPE:
-        // const aAsciiPacket = String.fromCharCode.apply(null, frame.data);
         const getNumReadings = (frame.data[this.ALIVE_NUM_OF_READINGS_OFFSET + 1] << 8) |
                                frame.data[this.ALIVE_NUM_OF_READINGS_OFFSET];
 
@@ -117,11 +162,18 @@ export class DataloggerService implements OnInit {
           numOfReadings: getNumReadings,
           rcvTimestamp:  aDate.getTime()
         };
+        const aTableRow: aliveTableRow = {
+          ID:            this.mappedMACtoID[frame.remote64],
+          numOfReadings: getNumReadings,
+          rcvTime:       aDate.toTimeString().slice(0, 8)
+        };
 
         console.log(aRow);
         this.consoleTextArray
-          .push(`<< ${aDate.toTimeString().slice(0, 8)} ${frame.remote64}: *ALIVE* Readings: ${getNumReadings}`);
+          .push(`<< ${aTableRow.rcvTime} ${aTableRow.ID}=> *ALIVE* Readings: ${getNumReadings}`);
         this.aliveData.push(aRow);
+
+        this.aliveTable.push(aTableRow);
         break;
       case this.COORD_RANGE_RECEIVED_TYPE:
         const rAsciiPacket = String.fromCharCode.apply(null, frame.data);
@@ -139,8 +191,27 @@ export class DataloggerService implements OnInit {
 
         console.log(rRow);
         this.consoleTextArray
-          .push(`<< ${rDate.toTimeString().slice(0, 8)} ${frame.remote64}: ${getAnchorID}<->${getTagID}: ${getRangingData}`);
+          .push(`<< ${rDate.toTimeString().slice(0, 8)} Node ${this.mappedMACtoID[frame.remote64]
+          }=> ${getAnchorID}<->${getTagID}: ${getRangingData}`);
         this.rangingData.push(rRow);
+
+        let isNewEntry: boolean = true;
+        if (this.rangingTable.length) {
+          this.rangingTable.forEach((row, it) => {
+            if (row.anchorID === rRow.anchorID && row.tagID === rRow.tagID) {
+              this.rangingTable[it].count = row.count + 1;
+              isNewEntry = false;
+            }
+          });
+        }
+        if (isNewEntry) {
+          const rTableRow: rangingTableRow = {
+            anchorID: getAnchorID - 0,
+            tagID: getTagID - 0,
+            count: 1
+          };
+          this.rangingTable.push(rTableRow);
+        }
         break;
       default:
     }

@@ -1,4 +1,3 @@
-<br />
 <!-- Connectivity Card start -->
 <div class="card" *ngIf="!isSerialConnected">
   <div class="card-body">
@@ -77,25 +76,64 @@
     <div class="col-md-12 col-lg-12">
       <div class="card">
         <div class="card-header" style="background-color:#ebfbfa">
-          <h4 class="my-0 text-primary">Control Board</h4>
+          <button (click)="sendPacket(network.startRangingType)" class="btn-sm btn-primary mx-1">
+            <b>Start Ranging</b>
+          </button>
+          <button (click)="sendPacket(network.finishRangingType)" class="btn-sm btn-primary mx-1">
+            <b>Finish Ranging</b>
+          </button>
+          <button (click)="sendPacket(network.startMovingNodeRangingType)" class="btn-sm btn-primary mx-1">
+            <b>Moving Node Ranging</b>
+          </button>
+          <button (click)="sendPacket(network.readSensorDataType)" class="btn-sm btn-primary mx-1">
+            <b>Read Sensor Data</b>
+          </button>
+          <button (click)="closePort()" class="btn-sm btn-danger mx-1">
+            <b>Close Port</b>
+          </button>
         </div>
         <div class="card-body">
-          <div class="row justify-content-center">
-            <button (click)="sendPacket(network.startRangingType)" class="btn btn-info mx-1">
-              <b>START RANGING</b>
-            </button>
-            <button (click)="sendPacket(network.finishRangingType)" class="btn btn-info mx-1">
-              <b>FINISH RANGING</b>
-            </button>
-            <button (click)="sendPacket(network.startMovingNodeRangingType)" class="btn btn-info mx-1">
-              <b>START MOVING NODE RANGING</b>
-            </button>
-            <button (click)="sendPacket(network.readSensorDataType)" class="btn btn-info mx-1">
-              <b>READ SENSOR DATA</b>
-            </button>
-            <button (click)="closePort()" class="btn btn-danger mx-1">
-              <b>CLOSE PORT</b>
-            </button>
+          <div class="card-columns">
+            <div class="card">
+              <div class="card-body">
+                <div class="table-wrapper-scroll-y my-custom-scrollbar">
+                  <table class="table table-sm">
+                    <thead>
+                    <tr>
+                      <th scope="col" *ngFor="let header of aliveHeaders">{{header}}</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr *ngFor="let row of network.dataLoggerService.aliveTable">
+                      <td>{{row.ID}}</td>
+                      <td>{{row.numOfReadings}}</td>
+                      <td>{{row.rcvTime}}</td>
+                    </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-body">
+                <div class="table-wrapper-scroll-y my-custom-scrollbar">
+                  <table class="table table-sm">
+                    <thead>
+                    <tr>
+                      <th scope="col" *ngFor="let header of rangingHeaders">{{header}}</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr *ngFor="let row of network.dataLoggerService.rangingTable">
+                      <td>{{row.anchorID}}</td>
+                      <td>{{row.tagID}}</td>
+                      <td>{{row.count}}</td>
+                    </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -106,7 +144,9 @@
     <div class="col-md-12 col-lg-12">
       <div class="card">
         <div class="card-header" style="background-color:#ebfbfa">
-          <h4 class="my-0 text-primary">Serial Monitor</h4>
+          <button class="btn-sm btn-info mx-1" (click)="getCSV(network.dataLoggerService.rangingData, 'ranging')">Ranging Data</button>
+          <button class="btn-sm btn-info mx-1" (click)="getCSV(network.dataLoggerService.sensorData, 'sensor')">Sensor Data</button>
+          <button class="btn-sm btn-info mx-1" (click)="getCSV(network.dataLoggerService.aliveData, 'alive')">Alive Data</button>
         </div>
         <div class="consoleOutput">
           <ng-template ngFor let-consoleText [ngForOf]="network.dataLoggerService.consoleTextArray">
@@ -115,9 +155,6 @@
         </div>
       </div>
       <br />
-      <button class="btn btn-info mx-1" (click)="getCSV(network.dataLoggerService.rangingData, 'ranging')">Ranging Data</button>
-      <button class="btn btn-info mx-1" (click)="getCSV(network.dataLoggerService.sensorData, 'sensor')">Sensor Data</button>
-      <button class="btn btn-info mx-1" (click)="getCSV(network.dataLoggerService.aliveData, 'alive')">Alive Data</button>
       <!-- Serial Monitoring End -->
     </div>
   </div>

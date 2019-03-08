@@ -1,7 +1,17 @@
 .consoleOutput {
   font-family: Consolas;
   overflow-y: scroll;
-  height: 300px;
+  height: 290px;
   resize: none; /* Remove this if you want the user to resize the textarea */
   background: white;
+}
+
+.my-custom-scrollbar {
+  position: relative;
+  height: 100px;
+  overflow: auto;
+}
+
+.table-wrapper-scroll-y {
+  display: block;
 }

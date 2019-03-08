@@ -28,6 +28,14 @@ export class SerialMonitorComponent implements OnInit, OnDestroy {
   public selectedPortId: string;
   public isSerialConnected: boolean = false;
 
+  readonly aliveHeaders = [
+    'nodeID', 'Readings', 'rcvTime'
+  ];
+
+  readonly rangingHeaders = [
+    'anchorID', 'tagID', 'count'
+  ];
+
   ngOnInit() {
     this.tableData = {
       headerRow: ['#', 'COM name', 'Manuf.', 'Vendor ID', 'Product ID'],
