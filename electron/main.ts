@@ -6,7 +6,9 @@ let win: BrowserWindow;
 
 function createWindow() {
   win = new BrowserWindow({
-    fullscreen: true,
+    // fullscreen: true,
+    width: 1000,
+    height: 1080,
     webPreferences: {
       nodeIntegration: true
     }
@@ -20,7 +22,7 @@ function createWindow() {
     })
   );
 
-  win.webContents.openDevTools();
+  // win.webContents.openDevTools();
 
   win.on("closed", () => {
     win = null;

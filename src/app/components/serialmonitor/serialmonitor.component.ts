@@ -29,7 +29,7 @@ export class SerialMonitorComponent implements OnInit, OnDestroy {
   public isSerialConnected: boolean = false;
 
   readonly aliveHeaders = [
-    'nodeID', 'Readings', 'rcvTime'
+    'nodeID', 'readings', 'rcvTime'
   ];
 
   readonly rangingHeaders = [
@@ -95,6 +95,7 @@ export class SerialMonitorComponent implements OnInit, OnDestroy {
     this.isSerialConnected = false;
     this.network.dataLoggerService.emptyConsoleArray();
     this.network.dataLoggerService.emptyCSVData();
+    this.network.dataLoggerService.emptyTableEntries();
     this.scan();
   }
 

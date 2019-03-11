@@ -104,10 +104,10 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr *ngFor="let row of network.dataLoggerService.aliveTable">
-                      <td>{{row.ID}}</td>
-                      <td>{{row.numOfReadings}}</td>
-                      <td>{{row.rcvTime}}</td>
+                    <tr *ngFor="let row of network.dataLoggerService.aliveTable | keyvalue">
+                      <td>{{row.value.ID}}</td>
+                      <td>{{row.value.numOfReadings}}</td>
+                      <td>{{row.value.rcvTime}}</td>
                     </tr>
                     </tbody>
                   </table>
@@ -124,10 +124,10 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr *ngFor="let row of network.dataLoggerService.rangingTable">
-                      <td>{{row.anchorID}}</td>
-                      <td>{{row.tagID}}</td>
-                      <td>{{row.count}}</td>
+                    <tr *ngFor="let row of network.dataLoggerService.rangingTable | keyvalue">
+                      <td>{{row.value.anchorID}}</td>
+                      <td>{{row.value.tagID}}</td>
+                      <td>{{row.value.count}}</td>
                     </tr>
                     </tbody>
                   </table>

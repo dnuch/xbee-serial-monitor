@@ -6,7 +6,9 @@ var url = require("url");
 var win;
 function createWindow() {
     win = new electron_1.BrowserWindow({
-        fullscreen: true,
+        // fullscreen: true,
+        width: 1000,
+        height: 1080,
         webPreferences: {
             nodeIntegration: true
         }
@@ -16,7 +18,7 @@ function createWindow() {
         protocol: "file:",
         slashes: true
     }));
-    win.webContents.openDevTools();
+    // win.webContents.openDevTools();
     win.on("closed", function () {
         win = null;
     });

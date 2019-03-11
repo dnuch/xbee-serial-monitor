@@ -8,7 +8,7 @@ import { DataloggerService } from '../datalogger/datalogger.service';
 })
 export class NetworkconfigService {
 
-  readonly coordinatorAddress = '0013A20041819B8C'; // main network
+  readonly coordinatorAddress = '0013a20041819b8c'; // main network
   // readonly coordinatorAddress = '0013a2004182d155'; // danny's network
 
   // packet types sent to coordinator

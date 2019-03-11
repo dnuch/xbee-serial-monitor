@@ -1,7 +1,7 @@
 .consoleOutput {
   font-family: Consolas;
   overflow-y: scroll;
-  height: 290px;
+  height: 250px;
   resize: none; /* Remove this if you want the user to resize the textarea */
   background: white;
 }

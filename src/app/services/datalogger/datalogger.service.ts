@@ -56,8 +56,8 @@ export class DataloggerService implements OnInit {
   //   '0013a20041819bab': 2  /* Node 2 */
   // };
 
-  public aliveTable: Array<aliveTableRow> = [];
-  public rangingTable: Array<rangingTableRow> = [];
+  public aliveTable = new Map<string, aliveTableRow>();
+  public rangingTable = new Map<string, rangingTableRow>();
 
   public consoleTextArray: Array<string> = [];
   public sensorData: Array<sensorRow> = [];
@@ -96,6 +96,7 @@ export class DataloggerService implements OnInit {
   ngOnInit() {
     this.emptyCSVData();
     this.emptyConsoleArray();
+    this.emptyTableEntries();
   }
 
   emptyConsoleArray() {
@@ -108,6 +109,11 @@ export class DataloggerService implements OnInit {
     this.sensorData = [];
   }
 
+  emptyTableEntries() {
+    this.aliveTable.clear();
+    this.rangingTable.clear();
+  }
+
   parsePacket(frame: any) {
     switch (frame.data[this.PACKET_TYPE_OFFSET]) {
       case this.SENSOR_TYPE:
@@ -116,7 +122,7 @@ export class DataloggerService implements OnInit {
 
         this.consoleTextArray
           .push(`<< ${sDate.toTimeString().slice(0, 8)} Node ${this.mappedMACtoID[frame.remote64]
-          }=> Data Size: ${getDataSize} bytes`);
+          } => Sensor Payload Size: ${getDataSize} bytes`);
 
         // timestamp (2 bytes), temperature (4 bytes), light (4 bytes)
         for (let i = 0; i < getDataSize / this.SENSOR_PAYLOAD_SIZE; i++) {
@@ -146,7 +152,6 @@ export class DataloggerService implements OnInit {
             rcvTimestamp:     sDate.getTime()
           };
 
-          console.log(sRow);
           this.consoleTextArray
             .push(`-> Timestamp: ${getTimestamp}, Temperature: ${getTemperatureValue}, Light: ${getLightValue}`);
           this.sensorData.push(sRow);
@@ -162,18 +167,24 @@ export class DataloggerService implements OnInit {
           numOfReadings: getNumReadings,
           rcvTimestamp:  aDate.getTime()
         };
-        const aTableRow: aliveTableRow = {
-          ID:            this.mappedMACtoID[frame.remote64],
-          numOfReadings: getNumReadings,
-          rcvTime:       aDate.toTimeString().slice(0, 8)
-        };
 
-        console.log(aRow);
+        const mappedMACtoID = this.mappedMACtoID[frame.remote64];
+        const rcvTime = aDate.toTimeString().slice(0, 8);
+
         this.consoleTextArray
-          .push(`<< ${aTableRow.rcvTime} ${aTableRow.ID}=> *ALIVE* Readings: ${getNumReadings}`);
+          .push(`<< ${rcvTime} Node ${mappedMACtoID} => *ALIVE* Readings: ${getNumReadings}`);
         this.aliveData.push(aRow);
 
-        this.aliveTable.push(aTableRow);
+        if (this.aliveTable.has(mappedMACtoID)) {
+          this.aliveTable.get(mappedMACtoID).numOfReadings = getNumReadings;
+          this.aliveTable.get(mappedMACtoID).rcvTime = rcvTime;
+        } else {
+          this.aliveTable.set(mappedMACtoID, {
+            ID:            mappedMACtoID,
+            numOfReadings: getNumReadings,
+            rcvTime:       aDate.toTimeString().slice(0, 8)
+          });
+        }
         break;
       case this.COORD_RANGE_RECEIVED_TYPE:
         const rAsciiPacket = String.fromCharCode.apply(null, frame.data);
@@ -192,25 +203,17 @@ export class DataloggerService implements OnInit {
         console.log(rRow);
         this.consoleTextArray
           .push(`<< ${rDate.toTimeString().slice(0, 8)} Node ${this.mappedMACtoID[frame.remote64]
-          }=> ${getAnchorID}<->${getTagID}: ${getRangingData}`);
+          } => ${getAnchorID}<->${getTagID}: ${getRangingData}`);
         this.rangingData.push(rRow);
 
-        let isNewEntry: boolean = true;
-        if (this.rangingTable.length) {
-          this.rangingTable.forEach((row, it) => {
-            if (row.anchorID === rRow.anchorID && row.tagID === rRow.tagID) {
-              this.rangingTable[it].count = row.count + 1;
-              isNewEntry = false;
-            }
+        if (this.rangingTable.has(getAnchorID + getTagID)) {
+          this.rangingTable.get(getAnchorID + getTagID).count++;
+        } else {
+          this.rangingTable.set(getAnchorID + getTagID, {
+            anchorID: rRow.anchorID,
+            tagID:    rRow.tagID,
+            count:    1
           });
-        }
-        if (isNewEntry) {
-          const rTableRow: rangingTableRow = {
-            anchorID: getAnchorID - 0,
-            tagID: getTagID - 0,
-            count: 1
-          };
-          this.rangingTable.push(rTableRow);
         }
         break;
       default:
