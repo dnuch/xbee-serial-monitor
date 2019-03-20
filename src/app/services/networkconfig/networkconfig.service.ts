@@ -55,6 +55,27 @@ export class NetworkconfigService {
       .push(`>> ${new Date().toTimeString().slice(0, 8)} ${this.coordinatorAddress}: ${frameType}`);
   }
 
+  writeATCommand(atType: string) {
+    const frameObject = {
+      type: this.C.FRAME_TYPE.AT_COMMAND,
+      // original
+      destination64: this.coordinatorAddress,
+      command: atType,
+      commandParameter: []
+    };
+
+    this.xbeeAPI.builder.write(frameObject);
+
+    this.dataLoggerService.consoleTextArray
+      .push(`>> ${new Date().toTimeString().slice(0, 8)} Observer: AT${atType}`);
+  }
+
+  xbeeATCommandRead() {
+    this.writeATCommand('ID');
+    this.writeATCommand('SH');
+    this.writeATCommand('SL');
+  }
+
   initXbeeAPI() {
     this.xbeeAPI = new this.electronService.xbee_api.XBeeAPI({
       api_mode: 2,
@@ -66,6 +87,8 @@ export class NetworkconfigService {
       this.zone.run(() => {
         if (typeof frame.data === 'object') {
           this.dataLoggerService.parsePacket(frame);
+        } else if (typeof frame.command === 'string') {
+          this.dataLoggerService.parseATCommand(frame);
         }
       });
     });

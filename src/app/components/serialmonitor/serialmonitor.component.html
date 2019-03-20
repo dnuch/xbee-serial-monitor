@@ -76,6 +76,9 @@
     <div class="col-md-12 col-lg-12">
       <div class="card">
         <div class="card-header" style="background-color:#ebfbfa">
+          <button (click)="sendATCommand('ND')" class="btn-sm btn-secondary mx-1">
+            <b>Network Discovery</b>
+          </button>
           <button (click)="sendPacket(network.startRangingType)" class="btn-sm btn-primary mx-1">
             <b>Start Ranging</b>
           </button>

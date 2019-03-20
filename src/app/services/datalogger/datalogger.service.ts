@@ -169,20 +169,20 @@ export class DataloggerService implements OnInit {
         };
 
         const mappedMACtoID = this.mappedMACtoID[frame.remote64];
-        const rcvTime = aDate.toTimeString().slice(0, 8);
+        const timeString = aDate.toTimeString().slice(0, 8);
 
         this.consoleTextArray
-          .push(`<< ${rcvTime} Node ${mappedMACtoID} => *ALIVE* Readings: ${getNumReadings}`);
+          .push(`<< ${timeString} Node ${mappedMACtoID} => *ALIVE* Readings: ${getNumReadings}`);
         this.aliveData.push(aRow);
 
         if (this.aliveTable.has(mappedMACtoID)) {
           this.aliveTable.get(mappedMACtoID).numOfReadings = getNumReadings;
-          this.aliveTable.get(mappedMACtoID).rcvTime = rcvTime;
+          this.aliveTable.get(mappedMACtoID).rcvTime = timeString;
         } else {
           this.aliveTable.set(mappedMACtoID, {
             ID:            mappedMACtoID,
             numOfReadings: getNumReadings,
-            rcvTime:       aDate.toTimeString().slice(0, 8)
+            rcvTime:       timeString
           });
         }
         break;
@@ -225,5 +225,31 @@ export class DataloggerService implements OnInit {
     let e = ((bits >>> 23) & 0xff);
     let m = (e == 0) ? (bits & 0x7fffff) << 1 : (bits & 0x7fffff) | 0x800000;
     return Math.round((sign * m * Math.pow(2, e - 150)) * 1000000) / 1000000;
+  }
+
+  parseATCommand(frame: any) {
+    switch (frame.command) {
+      case 'ID':
+        this.consoleTextArray
+          .push(`<< ${new Date().toTimeString().slice(0, 8)} Observer => PAN ID: ${this.buf2hex(frame.commandData)}`);
+        break;
+      case 'SH':
+        this.consoleTextArray
+          .push(`<< ${new Date().toTimeString().slice(0, 8)} Observer => MAC: ${this.buf2hex(frame.commandData)}`);
+        break;
+      case 'SL':
+        this.consoleTextArray[this.consoleTextArray.length - 1] += this.buf2hex(frame.commandData);
+        break;
+      case 'ND':
+        this.consoleTextArray
+          .push(`<< ${new Date().toTimeString().slice(0, 8)} Observer => NODE found: ${frame.nodeIdentification.nodeIdentifier
+          }, NODE ID: ${this.mappedMACtoID[frame.nodeIdentification.remote64]}`);
+        break;
+      default:
+    }
+  }
+
+  buf2hex(buffer) { // buffer is an ArrayBuffer
+    return Array.prototype.map.call(new Uint8Array(buffer), x => ('00' + x.toString(16)).slice(-2)).join('');
   }
 }

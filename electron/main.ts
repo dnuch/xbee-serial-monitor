@@ -7,7 +7,7 @@ let win: BrowserWindow;
 function createWindow() {
   win = new BrowserWindow({
     // fullscreen: true,
-    width: 1000,
+    width: 1050,
     height: 1080,
     webPreferences: {
       nodeIntegration: true

@@ -10,7 +10,8 @@
     "lint": "ng lint",
     "e2e": "ng e2e",
     "electron": "ng build --base-href ./ && tsc --p electron && electron .",
-    "rebuild": "electron-rebuild -f -w serialport"
+    "rebuild": "electron-rebuild -f -w serialport",
+    "win32-build": "electron-packager . spears-phalanx-monitor"
   },
   "private": true,
   "dependencies": {
@@ -25,8 +26,6 @@
     "angular5-csv": "^0.2.11",
     "bootstrap": "^4.3.1",
     "core-js": "^2.5.4",
-    "jquery": "^3.3.1",
-    "popper.js": "^1.14.7",
     "rxjs": "~6.3.3",
     "serialport": "^7.1.4",
     "tslib": "^1.9.0",
@@ -44,6 +43,7 @@
     "@types/node": "~8.9.4",
     "codelyzer": "~4.5.0",
     "electron": "^4.0.5",
+    "electron-packager": "^13.1.1",
     "electron-rebuild": "^1.8.4",
     "jasmine-core": "~2.99.1",
     "jasmine-spec-reporter": "~4.2.1",

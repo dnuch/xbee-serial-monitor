@@ -80,12 +80,17 @@ export class SerialMonitorComponent implements OnInit, OnDestroy {
     this.network.initConnectedPort(this.selectedPortId)
       .then(() => {
         console.log('Connection Successful');
+        this.network.xbeeATCommandRead();
         this.isSerialConnected = true;
       });
   }
 
   sendPacket(packetType: number) {
     this.network.writeFrameObject(packetType);
+  }
+
+  sendATCommand(atType: string) {
+    this.network.writeATCommand(atType);
   }
 
   closePort() {
