@@ -27,3 +27,7 @@ $ npm run rebuild
 `
 $ npm run electron
 `
+### Windows Build
+`
+$ npm run win32-build
+`

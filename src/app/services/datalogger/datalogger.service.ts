@@ -40,13 +40,14 @@ export class DataloggerService implements OnInit {
 
   // main sensor network
   readonly mappedMACtoID = {
-    '0013a20041819b8c': 0, /* Coordinator */
-    '0013a2004151a94c': 1, /* Node 1 (SMD) */
-    '0013a2004151a942': 2, /* Node 2 (SMD) */
-    '0013a2004151a94a': 3, /* Node 3 (SMD) */
-    '0013a20041819bb6': 4, /* Node 4 */
-    '0013a2004182d155': 5, /* Node 5 */
-    '0013a2004182d179': 6  /* Node 6 */
+    '0013a20041819b8c': 0, /* Coordinator A */
+    '0013a2004151a94c': 1, /* Orange 1/A */
+    '0013a2004151a942': 2, /* Orange 2/B */
+    '0013a2004151a94a': 3, /* Orange 3/C */
+    '0013a2004151a937': 4, /* Orange 4/D */
+    '0013a2004151a93d': 5, /* Orange 5/E */
+    '0013a2004151a94b': 6, /* Orange 6/F */
+    '0013a2004151a93f': 7  /* Orange 7/G */
   };
 
   // danny's network
@@ -220,13 +221,6 @@ export class DataloggerService implements OnInit {
     }
   }
 
-  float32ToNumber(bits: number): number {
-    let sign = ((bits >>> 31) == 0) ? 1.0 : -1.0;
-    let e = ((bits >>> 23) & 0xff);
-    let m = (e == 0) ? (bits & 0x7fffff) << 1 : (bits & 0x7fffff) | 0x800000;
-    return Math.round((sign * m * Math.pow(2, e - 150)) * 1000000) / 1000000;
-  }
-
   parseATCommand(frame: any) {
     switch (frame.command) {
       case 'ID':
@@ -243,10 +237,17 @@ export class DataloggerService implements OnInit {
       case 'ND':
         this.consoleTextArray
           .push(`<< ${new Date().toTimeString().slice(0, 8)} Observer => NODE found: ${frame.nodeIdentification.nodeIdentifier
-          }, NODE ID: ${this.mappedMACtoID[frame.nodeIdentification.remote64]}`);
+            }, NODE ID: ${this.mappedMACtoID[frame.nodeIdentification.remote64]}`);
         break;
       default:
     }
+  }
+
+  float32ToNumber(bits: number): number {
+    let sign = ((bits >>> 31) == 0) ? 1.0 : -1.0;
+    let e = ((bits >>> 23) & 0xff);
+    let m = (e == 0) ? (bits & 0x7fffff) << 1 : (bits & 0x7fffff) | 0x800000;
+    return Math.round((sign * m * Math.pow(2, e - 150)) * 1000000) / 1000000;
   }
 
   buf2hex(buffer) { // buffer is an ArrayBuffer

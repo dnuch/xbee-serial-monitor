@@ -9,7 +9,7 @@ import { DataloggerService } from '../datalogger/datalogger.service';
 export class NetworkconfigService {
 
   readonly coordinatorAddress = '0013a20041819b8c'; // main network
-  // readonly coordinatorAddress = '0013a2004182d155'; // danny's network
+  //readonly coordinatorAddress = '0013a2004182d155'; // danny's network
 
   // packet types sent to coordinator
   readonly startRangingType           = 0x09;
@@ -52,7 +52,7 @@ export class NetworkconfigService {
     this.xbeeAPI.builder.write(frameObject);
 
     this.dataLoggerService.consoleTextArray
-      .push(`>> ${new Date().toTimeString().slice(0, 8)} ${this.coordinatorAddress}: ${frameType}`);
+      .push(`>> ${new Date().toTimeString().slice(0, 8)} Node 0: ${frameType}`);
   }
 
   writeATCommand(atType: string) {
