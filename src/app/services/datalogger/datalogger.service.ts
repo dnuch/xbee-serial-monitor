@@ -204,7 +204,7 @@ export class DataloggerService implements OnInit {
         console.log(rRow);
         this.consoleTextArray
           .push(`<< ${rDate.toTimeString().slice(0, 8)} Node ${this.mappedMACtoID[frame.remote64]
-          } => ${getAnchorID}<->${getTagID}: ${getRangingData}`);
+          } => ${rRow.anchorID}<->${rRow.tagID}: ${getRangingData}`);
         this.rangingData.push(rRow);
 
         if (this.rangingTable.has(getAnchorID + getTagID)) {
