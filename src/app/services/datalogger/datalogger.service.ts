@@ -195,8 +195,8 @@ export class DataloggerService implements OnInit {
 
         const rDate = new Date();
         const rRow: rangingRow = {
-          anchorID:     getAnchorID - 0,
-          tagID:        getTagID - 0,
+          anchorID:     getAnchorID.charCodeAt(0) - 48,
+          tagID:        getTagID.charCodeAt(0) - 48,
           rangingData:  getRangingData - 0,
           rcvTimestamp: rDate.getTime()
         };
