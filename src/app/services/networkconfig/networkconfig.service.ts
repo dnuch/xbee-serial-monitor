@@ -16,6 +16,7 @@ export class NetworkconfigService {
   readonly finishRangingType          = 0x07;
   readonly startMovingNodeRangingType = 0x0A;
   readonly readSensorDataType         = 0x08;
+  readonly sendSavedRangesType        = 0xA7;
 
   // xbee constants
   public C: any;

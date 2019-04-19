@@ -86,11 +86,17 @@ export class DataloggerService implements OnInit {
   readonly COORD_RANGE_TAG_OFFSET = 2;
   readonly COORD_RANGE_DATA_OFFSET = 3;
 
+  // ranging data received has additional timestamp (2) in place of COORD_RANGE_DATA_OFFSET;
+  readonly COORD_RANGE_RECEIVED_TIMESTAMP_OFFSET = 3;
+  readonly COORD_RANGE_RECEIVED_RANGE_DATA_OFFSET = 5;
+
+
   // from sensing nodes
   readonly SENSOR_TYPE = 0x06;
   readonly NODE_ALIVE_TYPE = 0xA5;
   // from coordinator
   readonly COORD_RANGE_RECEIVED_TYPE = 0xA6;
+  readonly COORD_RANGE_SAVED_TYPE = 0xA8;
 
   constructor() { }
 
@@ -216,6 +222,27 @@ export class DataloggerService implements OnInit {
             count:    1
           });
         }
+        break;
+      case this.COORD_RANGE_SAVED_TYPE:
+        const _rAsciiPacket = String.fromCharCode.apply(null, frame.data);
+        const _getAnchorID = _rAsciiPacket.slice(this.COORD_RANGE_ANCHOR_OFFSET, this.COORD_RANGE_TAG_OFFSET);
+        const _getTagID = _rAsciiPacket.slice(this.COORD_RANGE_TAG_OFFSET, this.COORD_RANGE_RECEIVED_TIMESTAMP_OFFSET);
+        const _getTimeStamp = (frame.data[this.COORD_RANGE_RECEIVED_TIMESTAMP_OFFSET + 1] << 8) |
+                               frame.data[this.COORD_RANGE_RECEIVED_TIMESTAMP_OFFSET];
+        const _getRangingData = _rAsciiPacket.slice(this.COORD_RANGE_RECEIVED_RANGE_DATA_OFFSET, this.COORD_RANGE_RECEIVED_RANGE_DATA_OFFSET + 9);
+
+        const _rDate = new Date();
+        const _rRow = {
+          anchorID:     _getAnchorID.charCodeAt(0) - 48,
+          tagID:        _getTagID.charCodeAt(0) - 48,
+          rangingData:  _getRangingData - 0,
+          timestamp:    _getTimeStamp,
+          rcvTimestamp: _rDate.getTime()
+        };
+
+        this.consoleTextArray
+          .push(`<< ${_rDate.toTimeString().slice(0, 8)} Node ${this.mappedMACtoID[frame.remote64]
+            } => Timestamp: ${_rRow.timestamp} ${_rRow.anchorID}<->${_rRow.tagID}: ${_getRangingData}`);
         break;
       default:
     }
